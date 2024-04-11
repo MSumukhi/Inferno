@@ -1,20 +1,28 @@
-on: [push]
+name: Run Database Migrations
+
+on:
+  push:
+    branches:
+      - main
+      - master
 
 jobs:
-  inferno_test:
+  migrate:
     runs-on: ubuntu-latest
-    name: A job to run Inferno tests
+
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v2
 
-      # Add a step to print out debug information
-      - name: Print Dockerfile contents
-        run: cat Dockerfile
+      - name: Set up Ruby
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: '3.1' # Adjust to match your Ruby version
 
-      # Add a step to print out the contents of the database.yml file
-      - name: Print database.yml contents
-        run: cat config/database.yml
+      - name: Install Dependencies
+        run: |
+          gem install bundler
+          bundle install
 
-      - name: Run Inferno tests
-        uses: ./ # Use the action defined in your repository
+      - name: Run Database Migrations
+        run: bundle exec rake db:migrate
