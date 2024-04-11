@@ -1,0 +1,11 @@
+on: [push]
+
+jobs:
+  inferno_test:
+    runs-on: ubuntu-latest
+    name: A job to run Inferno tests
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Run Inferno tests
+        uses: ./ # Use the action defined in your repository
