@@ -7,7 +7,7 @@ module InfernoTemplate
     description 'A basic test suite template for Inferno'
 
     # These inputs will be available to all tests in this suite
-    input :url,
+    input :url, :access_token,
           title: 'FHIR Server Base Url'
 
     input :credentials,
@@ -15,9 +15,12 @@ module InfernoTemplate
           type: :oauth_credentials,
           optional: true
 
+    
+
     # All FHIR requests in this suite will use this FHIR client
     fhir_client do
       url :url
+      bearer_token :access_token 
       oauth_credentials :credentials
     end
 
@@ -49,5 +52,39 @@ module InfernoTemplate
     # Tests and TestGroups can be written in separate files and then included
     # using their id
     group from: :patient_group
+
+    group do
+      id :condition
+      title 'Condition'
+
+      input :patient_id
+
+      test do
+        id :condition_search_by_patient
+        title 'Condition Search by patient'
+        makes_request :condition_patient_search
+
+        run do
+          fhir_search('Condition', params: { patient: patient_id}, name: :condition_patient_search)
+
+          assert_response_status(200)
+          assert_resource_type('Bundle')
+        end
+      end
+
+      test do
+        id :condition_bundle_validation
+        title 'Condition Bundle is Valid'
+        uses_request :condition_patient_search
+
+        run do
+          assert_valid_bundle_entries(
+            resource_types: {
+              'Condition': 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition'
+            }
+          )
+        end
+      end
+    end
   end
 end
