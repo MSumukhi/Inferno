@@ -7,5 +7,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+
+      # Add a step to print out debug information
+      - name: Print Dockerfile contents
+        run: cat Dockerfile
+
+      # Add a step to print out the contents of the database.yml file
+      - name: Print database.yml contents
+        run: cat config/database.yml
+
       - name: Run Inferno tests
         uses: ./ # Use the action defined in your repository
