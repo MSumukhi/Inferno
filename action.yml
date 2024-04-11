@@ -1,0 +1,5 @@
+name: 'Inferno Test'
+description: 'Run Inferno tests'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
