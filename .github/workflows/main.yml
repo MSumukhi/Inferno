@@ -1,4 +1,4 @@
-name: Run Database Migrations
+name: Run Database Migrations and Docker
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
       - master
 
 jobs:
-  migrate:
+  migrate_and_run_docker:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,3 +26,9 @@ jobs:
 
       - name: Run Database Migrations
         run: bundle exec rake db:migrate
+
+      - name: Build Docker Image
+        run: docker build -t inferno .
+
+      - name: Run Docker Container
+        run: docker run inferno
