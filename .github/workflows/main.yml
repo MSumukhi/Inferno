@@ -1,34 +1,19 @@
-name: Run Database Migrations and Docker
+name: Run Docker Compose
 
 on:
   push:
     branches:
       - main
-      - master
 
 jobs:
-  migrate_and_run_docker:
+  docker-compose:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Set up Ruby
-        uses: actions/setup-ruby@v1
+      - name: Set up Docker Compose
+        uses: hoverkraft-tech/compose-action@v1.5.1
         with:
-          ruby-version: '3.1' # Adjust to match your Ruby version
-
-      - name: Install Dependencies
-        run: |
-          gem install bundler
-          bundle install
-
-      - name: Run Database Migrations
-        run: bundle exec rake db:migrate
-
-      - name: Build Docker Image
-        run: docker build -t inferno .
-
-      - name: Run Docker Container
-        run: docker run inferno
+          compose-file: "./docker/docker-compose.yml"
