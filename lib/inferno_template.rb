@@ -15,8 +15,6 @@ module InfernoTemplate
           type: :oauth_credentials,
           optional: true
 
-    
-
     # All FHIR requests in this suite will use this FHIR client
     fhir_client do
       url :url
@@ -24,7 +22,7 @@ module InfernoTemplate
       oauth_credentials :credentials
     end
 
-    # All FHIR validation requsets will use this FHIR validator
+    # All FHIR validation requests will use this FHIR validator
     validator do
       url ENV.fetch('VALIDATOR_URL')
     end
@@ -81,6 +79,40 @@ module InfernoTemplate
           assert_valid_bundle_entries(
             resource_types: {
               'Condition': 'http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition'
+            }
+          )
+        end
+      end
+    end
+
+    group do
+      id :vital_signs
+      title 'Vital Signs'
+
+      input :patient_id
+
+      test do
+        id :vital_signs_search_by_patient
+        title 'Vital Signs Search by patient'
+        makes_request :vital_signs_patient_search
+
+        run do
+          fhir_search('Observation', params: { patient: patient_id, category: 'vital-signs' }, name: :vital_signs_patient_search)
+
+          assert_response_status(200)
+          assert_resource_type('Bundle')
+        end
+      end
+
+      test do
+        id :vital_signs_bundle_validation
+        title 'Vital Signs Bundle is Valid'
+        uses_request :vital_signs_patient_search
+
+        run do
+          assert_valid_bundle_entries(
+            resource_types: {
+              'Observation': 'http://hl7.org/fhir/StructureDefinition/Observation'
             }
           )
         end
